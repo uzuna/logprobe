@@ -7,7 +7,7 @@ CEDECで[prontf拡張の話](https://www.famitsu.com/news/202009/06205314.html)�
 基本はこの思想に基づいている
 
 
-## Spevification 
+## Specification 
 
 ### format
 
@@ -74,3 +74,12 @@ MessagePackを使う
 
 [MessagePack](https://msgpack.org/ja.html)
 効率の良いバイナリ形式のオブジェクトシリアライズフォーマット。
+
+
+## Components
+
+必要なもの
+
+- Log Storage: ログを保存し呼び出せる
+- Log Receiver: クライアントからの接続を受け付ける
+- Log Client

@@ -44,7 +44,8 @@ mod tests {
     use rmp;
     use rmps::{Deserializer, Serializer};
     use std::io::Cursor;
-
+    use std::fs::File;
+    use std::io::prelude::*;
     #[test]
     fn usage_rmp_basic() {
         let mut buf = Vec::new();
@@ -61,5 +62,36 @@ mod tests {
         let mut de = Deserializer::new(cur);
         let actual: LogRecord = Deserialize::deserialize(&mut de).unwrap();
         assert_eq!(&value, &actual);
+    }
+    #[test]
+    fn usage_rmp_struct_multi() {
+        let mut buf = Vec::new();
+        let value1 = LogRecord::debug("test.dummy", "hello world");
+        let value2 = LogRecord::debug("test.dummy", "Are you like log?");
+        value1.serialize(&mut Serializer::new(&mut buf)).unwrap();
+        value2.serialize(&mut Serializer::new(&mut buf)).unwrap();
+
+        let cur = Cursor::new(&buf[..]);
+        let mut de = Deserializer::new(cur);
+        let actual1: LogRecord = Deserialize::deserialize(&mut de).unwrap();
+        let actual2: LogRecord = Deserialize::deserialize(&mut de).unwrap();
+        assert_eq!(&value1, &actual1);
+        assert_eq!(&value2, &actual2);
+        assert_ne!(&value2, &actual1);
+        assert_ne!(&value1, &actual2);
+    }
+
+    #[test]
+    fn usage_rmp_parse_struct_from_file() {
+        let mut file = File::open("testdata/dummy.msgpack").unwrap();
+        let mut buf = Vec::new();
+        file.read_to_end(&mut buf).unwrap();
+
+        let cur = Cursor::new(&buf[..]);
+        let mut de = Deserializer::new(cur);
+        let actual1: LogRecord = Deserialize::deserialize(&mut de).unwrap();
+        let actual2: LogRecord = Deserialize::deserialize(&mut de).unwrap();
+        assert_eq!(&actual1.category, &actual2.category);
+        assert_ne!(&actual1.message, &actual2.message);
     }
 }
