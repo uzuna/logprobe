@@ -64,7 +64,6 @@ LOG_INFO(
 "."で階層を区切る`<cat1>.<cat2>`
 
 
-
 ## 方針
 
 MessagePackを使う
@@ -83,3 +82,23 @@ MessagePackを使う
 - Log Storage: ログを保存し呼び出せる
 - Log Receiver: クライアントからの接続を受け付ける
 - Log Client
+
+
+### API
+
+logを実装する
+
+可変長可変型をどのように実装するのか?
+
+1. マクロ
+1. Heterogeneous List (e.g. [frunk](https://github.com/lloydmeta/frunk))
+1. Enumで型を定義
+
+前2つは今のスキル的にやや難しいのでEnumで実現させる
+
+## TODO
+
+- [ ] format logAPIの実装
+    - [ ] primitive KeyValue
+    - [ ] 構造体
+- [ ] ログ保存と閲覧CLIの作成

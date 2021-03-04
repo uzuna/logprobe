@@ -2,6 +2,8 @@ extern crate serde;
 #[macro_use]
 extern crate serde_derive;
 extern crate rmp_serde as rmps;
+use std::collections::HashMap;
+
 use serde::{Deserialize, Serialize};
 
 use chrono::{DateTime, Utc};
@@ -14,6 +16,17 @@ enum LogLevel {
     Error,
     Fatal,
 }
+#[derive(Debug, PartialEq, Deserialize, Serialize)]
+enum Value {
+    Null,
+    String(String),
+}
+
+#[derive(Debug, PartialEq, Deserialize, Serialize)]
+struct ArgMap<V> {
+    map: std::collections::HashMap<String, V>,
+}
+
 
 #[derive(Debug, PartialEq, Deserialize, Serialize)]
 struct LogRecord {
@@ -21,6 +34,7 @@ struct LogRecord {
     timestamp: DateTime<Utc>,
     category: String,
     message: String,
+    args: Option<ArgMap<Value>>,
 }
 
 impl LogRecord {
@@ -30,12 +44,9 @@ impl LogRecord {
             timestamp: Utc::now(),
             category: cat.to_string(),
             message: msg.to_string(),
+            args: None,
         }
     }
-}
-
-fn main() {
-    println!("Hello, world!");
 }
 
 #[cfg(test)]
@@ -43,9 +54,9 @@ mod tests {
     use crate::*;
     use rmp;
     use rmps::{Deserializer, Serializer};
-    use std::io::Cursor;
     use std::fs::File;
     use std::io::prelude::*;
+    use std::io::Cursor;
     #[test]
     fn usage_rmp_basic() {
         let mut buf = Vec::new();
@@ -93,5 +104,10 @@ mod tests {
         let actual2: LogRecord = Deserialize::deserialize(&mut de).unwrap();
         assert_eq!(&actual1.category, &actual2.category);
         assert_ne!(&actual1.message, &actual2.message);
+    }
+
+    #[test]
+    fn macro_msgpack_encode() {
+        msgpack_encode!();
     }
 }
