@@ -174,7 +174,9 @@ mod tests {
     fn log_debugf() {
         let mut args = ArgMap::new();
         args.string("name", "alty");
-        args.bool("use_bool", true);
+        args.bool("key_bool", true);
+        args.int("key_int", 32);
+        args.uint("key_uint", 42);
         let val = LogRecord::debugf("test.dummy", "Are you like log {name}", Some(args));
 
         print!("{:?}", val);
