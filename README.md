@@ -4,6 +4,7 @@
 
 実際にプログラムを動かす環境とデバッグ環境が異なり、高頻度の情報が必要なときにはデータの収集を外に持ち出したい。
 CEDECで[prontf拡張の話](https://www.famitsu.com/news/202009/06205314.html)があった。
+またその参照元である[FINAL FANTASY XVの開発を支えるバックエンド](https://cedec.cesa.or.jp/2016/session/ENG/4999.html)でログを分離する仕組みやそのフォーマットについても言及がある
 基本はこの思想に基づいている
 
 
@@ -50,6 +51,37 @@ LOG_INFO(
 }
 
 ```
+
+#### 実装例
+
+```
+LogBuilger("EntryA")
+    .Tag("Type", "Engeneer")
+    .Log("Name", "Mataro")
+    .Log("Age", 35);
+LogBuilger("EntryB")
+    .Tag("Type", "Engeneer")
+    .Log("Name", "Ingimar")
+    .Log("Age", 36);
+```
+
+メモリ内にはKey-Valueな独自フォーマットで保持される
+
+ID|Type|Data
+:--|:--|:--
+1|Start|EntryA
+2|Start|EntryB
+1|Tag|Type,Engeneer
+1|Log|Name,Mataro
+2|Tag|Type,Engeneer
+2|Log|Name,Ingimar
+2|Log|Age,36
+1|Log|Age,35
+1|Finish|Timestamp
+2|Finish|Timestamp
+
+1セッション単位でログを管理
+ログ毎にUniqueなIDがあるのでAggregatorがログを再構築してCSVで保存
 
 #### Level
 
