@@ -20,6 +20,9 @@ fn impl_hello_macro(ast: &syn::DeriveInput) -> TokenStream {
             fn hello_macro() {
                 println!("Hello, Macro! My name is {}!", stringify!(#name));
             }
+            fn hello_method(&self) -> String{
+                format!("Hello, Macro! My name is {}!", stringify!(#name))
+            }
         }
     };
     gen.into()

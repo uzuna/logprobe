@@ -1,5 +1,6 @@
 pub trait HelloMacro {
     fn hello_macro();
+    fn hello_method(&self) -> String;
 }
 
 
@@ -12,6 +13,9 @@ mod tests {
         fn hello_macro() {
             println!("Hello, Macro! My name is Pancakes!")
         }
+        fn hello_method(&self) -> String {
+            "Hello, Macro! My name is Pancakes!".to_owned()
+        }
     }
 
 
@@ -19,12 +23,18 @@ mod tests {
     #[derive(HelloMacro)]
     struct Hotcakes;
 
+    fn check_bound<M: HelloMacro>(x: M) {
+        println!("{}", x.hello_method())
+    }
+
     #[test]
     fn pancakes(){
         Pancakes::hello_macro();
+        check_bound(Pancakes{});
     }
     #[test]
     fn hotcakes(){
         Hotcakes::hello_macro();
+        check_bound(Hotcakes{});
     }
 }

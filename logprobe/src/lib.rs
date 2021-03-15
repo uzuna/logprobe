@@ -4,12 +4,12 @@ extern crate serde_derive;
 extern crate rmp_serde as rmps;
 use std::collections::HashMap;
 
-use serde::{Deserialize, Serialize};
+
 
 use chrono::{DateTime, Utc};
 
 #[derive(Debug, PartialEq, Deserialize, Serialize)]
-enum LogLevel {
+pub enum LogLevel {
     Debug,
     Info,
     Warning,
@@ -18,7 +18,7 @@ enum LogLevel {
 }
 
 #[derive(Debug, PartialEq, Deserialize, Serialize)]
-enum Value {
+pub enum Value {
     Null,
     String(String),
     Bool(bool),
@@ -27,16 +27,20 @@ enum Value {
 }
 
 #[derive(Debug, PartialEq, Deserialize, Serialize)]
-enum Number {
+pub enum Number {
     I64(i64),
     U64(u64),
     F64(f64),
 }
 
 #[derive(Debug, PartialEq, Deserialize, Serialize)]
-struct Object {
+pub struct Object {
     name: String,
     map: HashMap<String, Value>,
+}
+
+pub trait Mapper {
+    fn to_object(&self) -> Object;
 }
 
 #[derive(Debug, PartialEq, Deserialize, Serialize)]
@@ -65,8 +69,8 @@ impl ArgMap {
     fn u64(&mut self, key: &str, value: u64){
         self.map.insert(key.to_string(), Value::Number(Number::U64(value)));
     }
-    fn object(&mut self, key: &str, value: u64){
-        self.map.insert(key.to_string(), Value::Number(Number::U64(value)));
+    fn object(&mut self, key: &str, value: Object){
+        self.map.insert(key.to_string(), Value::Object(value));
     }
 }
 
@@ -105,8 +109,8 @@ mod tests {
     use crate::*;
     use rmp;
     use rmps::{Deserializer, Serializer};
-    use std::fs::File;
-    use std::io::prelude::*;
+    
+    
     use std::io::Cursor;
     #[test]
     fn usage_rmp_basic() {
@@ -180,6 +184,22 @@ mod tests {
     //     assert_ne!(&actual1.message, &actual2.message);
     // }
 
+    struct DummyStruct {
+        a: i64,
+        b: String,
+    }
+    impl Mapper for DummyStruct {
+        fn to_object(&self) -> Object {
+            let mut m = HashMap::new();
+            m.insert("a".to_string(), Value::Number(Number::I64(self.a)));
+            m.insert("b".to_string(), Value::String(self.b.to_string()));
+            Object{
+                name: "DummyStruct".to_string(),
+                map: m,
+            }
+        }
+    }
+
     #[test]
     fn log_debugf() {
         let mut args = ArgMap::new();
@@ -188,6 +208,7 @@ mod tests {
         args.i64("key_int", 32);
         args.u64("key_uint", 42);
         args.f64("key_uint", 42.195);
+        args.object("key_object", DummyStruct{a:1, b:"test".to_string()}.to_object());
         let val = LogRecord::debugf("test.dummy", "Are you like log {name}", Some(args));
 
         print!("{:?}", val);
