@@ -8,8 +8,6 @@ use serde::{Deserialize, Serialize};
 
 use chrono::{DateTime, Utc};
 
-mod hello;
-
 #[derive(Debug, PartialEq, Deserialize, Serialize)]
 enum LogLevel {
     Debug,
