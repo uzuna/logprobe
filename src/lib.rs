@@ -49,13 +49,13 @@ impl ArgMap {
     fn bool(&mut self, key: &str, value: bool){
         self.map.insert(key.to_string(), Value::Bool(value));
     }
-    fn float(&mut self, key: &str, value: f64){
+    fn f64(&mut self, key: &str, value: f64){
         self.map.insert(key.to_string(), Value::Number(Number::F64(value)));
     }
-    fn int(&mut self, key: &str, value: i64){
+    fn i64(&mut self, key: &str, value: i64){
         self.map.insert(key.to_string(), Value::Number(Number::I64(value)));
     }
-    fn uint(&mut self, key: &str, value: u64){
+    fn u64(&mut self, key: &str, value: u64){
         self.map.insert(key.to_string(), Value::Number(Number::U64(value)));
     }
 }
@@ -175,8 +175,9 @@ mod tests {
         let mut args = ArgMap::new();
         args.string("name", "alty");
         args.bool("key_bool", true);
-        args.int("key_int", 32);
-        args.uint("key_uint", 42);
+        args.i64("key_int", 32);
+        args.u64("key_uint", 42);
+        args.f64("key_uint", 42.195);
         let val = LogRecord::debugf("test.dummy", "Are you like log {name}", Some(args));
 
         print!("{:?}", val);

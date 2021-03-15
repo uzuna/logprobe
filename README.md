@@ -120,7 +120,7 @@ MessagePackを使う
 
 logを実装する
 
-可変長可変型をどのように実装するのか?
+可変長可変型をどのように実装するのか? -> Enumでベタ実装
 
 1. マクロ
 1. Heterogeneous List (e.g. [frunk](https://github.com/lloydmeta/frunk))
@@ -131,6 +131,7 @@ logを実装する
 ## TODO
 
 - [ ] format logAPIの実装
-    - [ ] primitive KeyValue
+    - [x] primitive KeyValue
     - [ ] 構造体
 - [ ] ログ保存と閲覧CLIの作成
+    - [ ] セッション別ファイルに保存する
