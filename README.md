@@ -133,5 +133,22 @@ logを実装する
 - [ ] format logAPIの実装
     - [x] primitive KeyValue
     - [ ] 構造体
+        - derive macro実装が必要? serdeを参考にする
 - [ ] ログ保存と閲覧CLIの作成
     - [ ] セッション別ファイルに保存する
+
+
+
+
+## Memo
+
+### macro
+
+[Reference](https://doc.rust-jp.rs/book-ja/ch19-06-macros.html)
+Rustの場合可変長引数は関数に渡せないためmacroを使う必要が有る
+
+1. 宣言的マクロ `macro_rules!` を使い、マクロ式を展開してRustのコードが生成される
+1. 手続き型マクロ コードを入力として受取、コードに作用する
+    - deriveマクロ
+    - 属性風マクロ
+    - 関数風マクロ

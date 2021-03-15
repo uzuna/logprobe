@@ -8,6 +8,8 @@ use serde::{Deserialize, Serialize};
 
 use chrono::{DateTime, Utc};
 
+mod hello;
+
 #[derive(Debug, PartialEq, Deserialize, Serialize)]
 enum LogLevel {
     Debug,
@@ -23,6 +25,7 @@ enum Value {
     String(String),
     Bool(bool),
     Number(Number),
+    Object(Object),
 }
 
 #[derive(Debug, PartialEq, Deserialize, Serialize)]
@@ -30,6 +33,12 @@ enum Number {
     I64(i64),
     U64(u64),
     F64(f64),
+}
+
+#[derive(Debug, PartialEq, Deserialize, Serialize)]
+struct Object {
+    name: String,
+    map: HashMap<String, Value>,
 }
 
 #[derive(Debug, PartialEq, Deserialize, Serialize)]
@@ -56,6 +65,9 @@ impl ArgMap {
         self.map.insert(key.to_string(), Value::Number(Number::I64(value)));
     }
     fn u64(&mut self, key: &str, value: u64){
+        self.map.insert(key.to_string(), Value::Number(Number::U64(value)));
+    }
+    fn object(&mut self, key: &str, value: u64){
         self.map.insert(key.to_string(), Value::Number(Number::U64(value)));
     }
 }
