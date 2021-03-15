@@ -4,8 +4,7 @@ extern crate serde_derive;
 extern crate rmp_serde as rmps;
 use std::collections::HashMap;
 
-
-
+use serde::{Deserialize, Serialize};
 use chrono::{DateTime, Utc};
 
 #[derive(Debug, PartialEq, Deserialize, Serialize)]
@@ -69,8 +68,8 @@ impl ArgMap {
     fn u64(&mut self, key: &str, value: u64){
         self.map.insert(key.to_string(), Value::Number(Number::U64(value)));
     }
-    fn object(&mut self, key: &str, value: Object){
-        self.map.insert(key.to_string(), Value::Object(value));
+    fn object<M: Mapper>(&mut self, key: &str, value: M){
+        self.map.insert(key.to_string(), Value::Object(value.to_object()));
     }
 }
 
@@ -188,7 +187,7 @@ mod tests {
         a: i64,
         b: String,
     }
-    impl Mapper for DummyStruct {
+    impl Mapper for &DummyStruct {
         fn to_object(&self) -> Object {
             let mut m = HashMap::new();
             m.insert("a".to_string(), Value::Number(Number::I64(self.a)));
@@ -208,7 +207,7 @@ mod tests {
         args.i64("key_int", 32);
         args.u64("key_uint", 42);
         args.f64("key_uint", 42.195);
-        args.object("key_object", DummyStruct{a:1, b:"test".to_string()}.to_object());
+        args.object("key_object", &DummyStruct{a:1, b:"test".to_string()});
         let val = LogRecord::debugf("test.dummy", "Are you like log {name}", Some(args));
 
         print!("{:?}", val);
