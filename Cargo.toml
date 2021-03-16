@@ -1,6 +1,6 @@
 [workspace]
 members = [
-    "logprobe",
+    "plobe",
     "hello_derive",
     "hello_macro",
 ]

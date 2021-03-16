@@ -38,10 +38,6 @@ pub struct Object {
     map: HashMap<String, Value>,
 }
 
-pub trait Mapper {
-    fn to_object(&self) -> Object;
-}
-
 #[derive(Debug, PartialEq, Deserialize, Serialize)]
 struct ArgMap {
     map: HashMap<String, Value>,
@@ -53,20 +49,11 @@ impl ArgMap {
             map: HashMap::new(),
         }
     }
-    fn string(&mut self, key: &str, value: &str){
-        self.map.insert(key.to_string(), Value::String(value.to_string()));
-    }
-    fn bool(&mut self, key: &str, value: bool){
-        self.map.insert(key.to_string(), Value::Bool(value));
-    }
     fn f64(&mut self, key: &str, value: f64){
         self.map.insert(key.to_string(), Value::Number(Number::F64(value)));
     }
-    fn i64(&mut self, key: &str, value: i64){
-        self.map.insert(key.to_string(), Value::Number(Number::I64(value)));
-    }
-    fn u64(&mut self, key: &str, value: u64){
-        self.map.insert(key.to_string(), Value::Number(Number::U64(value)));
+    fn value<C: Converter>(&mut self, key: &str, value: C){
+        self.map.insert(key.to_string(), value.to_value());
     }
     fn object<M: Mapper>(&mut self, key: &str, value: M){
         self.map.insert(key.to_string(), Value::Object(value.to_object()));
@@ -102,6 +89,69 @@ impl LogRecord {
         }
     }
 }
+
+
+// Structをログ用の構造体に変換する
+pub trait Mapper {
+    fn to_object(&self) -> Object;
+}
+
+pub trait Converter: Sized {
+    fn to_value(&self) -> Value;
+}
+
+impl Converter for String {
+    fn to_value(&self) -> Value {
+        Value::String(self.to_string())
+    }
+}
+
+impl Converter for &str {
+    fn to_value(&self) -> Value {
+        Value::String(self.to_string())
+    }
+}
+
+impl Converter for bool {
+    fn to_value(&self) -> Value {
+        Value::Bool(*self)
+    }
+}
+
+// int uint はマクロで64
+macro_rules! integer_impls {
+    ($($type:ty)+) => {
+        $(
+            impl Converter for $type {
+                #[inline]
+                fn to_value(&self) -> Value {
+                    Value::Number(Number::I64(*self as i64))
+                }
+            }
+        )+
+    }
+}
+integer_impls! {
+    i8 i16 i32 i64 isize
+}
+
+macro_rules! uinteger_impls {
+    ($($type:ty)+) => {
+        $(
+            impl Converter for $type {
+                #[inline]
+                fn to_value(&self) -> Value {
+                    Value::Number(Number::U64(*self as u64))
+                }
+            }
+        )+
+    }
+}
+uinteger_impls! {
+    u8 u16 u32 u64 usize
+}
+
+
 
 #[cfg(test)]
 mod tests {
@@ -202,11 +252,11 @@ mod tests {
     #[test]
     fn log_debugf() {
         let mut args = ArgMap::new();
-        args.string("name", "alty");
-        args.bool("key_bool", true);
-        args.i64("key_int", 32);
-        args.u64("key_uint", 42);
-        args.f64("key_uint", 42.195);
+        args.value("name", "alty");
+        args.value("key_bool", true);
+        args.value("key_int", 32);
+        args.value("key_uint", 42);
+        args.f64("key_float", 42.195);
         args.object("key_object", &DummyStruct{a:1, b:"test".to_string()});
         let val = LogRecord::debugf("test.dummy", "Are you like log {name}", Some(args));
 
