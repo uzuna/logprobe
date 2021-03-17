@@ -21,7 +21,9 @@ mod tests {
 
 
     #[derive(HelloMacro)]
-    struct Hotcakes;
+    struct Hotcakes {
+        a: i32,
+    }
 
     fn check_bound<M: HelloMacro>(x: M) {
         println!("{}", x.hello_method())
@@ -35,6 +37,6 @@ mod tests {
     #[test]
     fn hotcakes(){
         Hotcakes::hello_macro();
-        check_bound(Hotcakes{});
+        check_bound(Hotcakes{a:1});
     }
 }

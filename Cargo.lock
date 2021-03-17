@@ -78,14 +78,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "plobe_derive"
-version = "0.1.0"
-dependencies = [
- "quote",
- "syn",
-]
-
-[[package]]
 name = "proc-macro2"
 version = "1.0.24"
 source = "registry+https://github.com/rust-lang/crates.io-index"

@@ -15,6 +15,8 @@ pub fn hello_macro_derive(input: TokenStream) -> TokenStream {
 
 fn impl_hello_macro(ast: &syn::DeriveInput) -> TokenStream {
     let name = &ast.ident;
+    // https://users.rust-lang.org/t/syn-how-do-i-iterate-on-the-fields-of-a-struct/42600/5
+    // fieldの中身を取り出す。結構大変
     let gen = quote! {
         impl HelloMacro for #name {
             fn hello_macro() {

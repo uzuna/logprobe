@@ -151,6 +151,21 @@ uinteger_impls! {
     u8 u16 u32 u64 usize
 }
 
+macro_rules! float_impls {
+    ($($type:ty)+) => {
+        $(
+            impl Converter for $type {
+                #[inline]
+                fn to_value(&self) -> Value {
+                    Value::Number(Number::F64(*self as f64))
+                }
+            }
+        )+
+    }
+}
+float_impls! {
+    f32 f64
+}
 
 
 #[cfg(test)]
@@ -240,8 +255,8 @@ mod tests {
     impl Mapper for &DummyStruct {
         fn to_object(&self) -> Object {
             let mut m = HashMap::new();
-            m.insert("a".to_string(), Value::Number(Number::I64(self.a)));
-            m.insert("b".to_string(), Value::String(self.b.to_string()));
+            m.insert("a".to_string(), self.a.to_value());
+            m.insert("b".to_string(), self.b.to_value());
             Object{
                 name: "DummyStruct".to_string(),
                 map: m,
@@ -256,7 +271,7 @@ mod tests {
         args.value("key_bool", true);
         args.value("key_int", 32);
         args.value("key_uint", 42);
-        args.f64("key_float", 42.195);
+        args.value("key_float", 42.195);
         args.object("key_object", &DummyStruct{a:1, b:"test".to_string()});
         let val = LogRecord::debugf("test.dummy", "Are you like log {name}", Some(args));
 
